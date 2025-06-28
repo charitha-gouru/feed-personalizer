@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Feed Ranker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        input, select, button { margin: 8px 0; padding: 6px; }
+        label { display: block; margin-top: 10px; }
+        .ranked { margin-top: 20px; }
+        ul { list-style-type: none; padding-left: 0; }
+    </style>
+</head>
+<body>
+    <h2>📊 Feed Ranker Interface</h2>
+
+    <form id="rankForm">
+        <label>
+            Length:
+            <input type="number" id="length" min="1" required>
+        </label>
+
+        <label>
+            Likes:
+            <input type="number" id="likes" min="0" required>
+        </label>
+
+        <label>
+            Topic:
+            <select id="topic" required>
+                <option value="">-- Select a topic --</option>
+                <option value="sports">Sports</option>
+                <option value="news">News</option>
+                <option value="movies">Movies</option>
+                <option value="education">Education</option>
+                <option value="technology">Technology</option>
+            </select>
+        </label>
+
+        <button type="button" onclick="addContent()">Add Content</button>
+        <button type="submit">Rank Feed</button>
+    </form>
+
+    <h4>📝 Content Items</h4>
+    <ul id="contentList"></ul>
+
+    <div class="ranked">
+        <h4>🏆 Ranked Feed</h4>
+        <ul id="rankedList"></ul>
+    </div>
+
+    <script>
+        const contentItems = [];
+
+        function addContent() {
+            const length = document.getElementById('length').value;
+            const likes = document.getElementById('likes').value;
+            const topic = document.getElementById('topic').value;
+
+            if (!length || !likes || !topic) {
+                alert("Please fill in all the fields.");
+                return;
+            }
+
+            const item = { length: Number(length), likes: Number(likes), topic };
+            contentItems.push(item);
+
+            const li = document.createElement("li");
+            li.textContent = `Length: ${item.length}, Likes: ${item.likes}, Topic: ${item.topic}`;
+            document.getElementById('contentList').appendChild(li);
+
+            document.getElementById('rankForm').reset();
+        }
+
+        document.getElementById('rankForm').addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            if (contentItems.length === 0) {
+                alert("Please add at least one content item before ranking.");
+                return;
+            }
+
+            const response = await fetch("http://localhost:8000/rank", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(contentItems)
+            });
+
+            const result = await response.json();
+            const rankedList = document.getElementById("rankedList");
+            rankedList.innerHTML = "";
+
+            result.ranked_feed.forEach((item, i) => {
+                const li = document.createElement("li");
+                li.textContent = `#${i + 1} | Length: ${item.length}, Likes: ${item.likes}, Topic: ${item.topic}, Score: ${item.score.toFixed(2)}`;
+                rankedList.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "model_version": "1.0.0",
+  "features": [
+    "post_karma",
+    "user_follows_tag",
+    "is_buddy_post",
+    "time_match_score",
+    "content_type_text",
+    "content_type_image",
+    "author_branch_similarity",
+    "karma_squared",
+    "tag_overlap_count",
+    "noise",
+    "post_id_noise"
+  ],
+  "model_path": "model.pkl",
+  "model_threshold": 0.5,
+  "default_score": 0.4
+}
